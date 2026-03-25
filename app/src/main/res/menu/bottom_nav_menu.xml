@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home"
+        android:title="Trang chủ"
+        tools:ignore="HardcodedText" />
+
+    <item
+        android:id="@+id/nav_category"
+        android:icon="@drawable/category_icon"
+        android:title="Danh mục"
+        tools:ignore="HardcodedText" />
+
+    <item
+        android:id="@+id/nav_cart"
+        android:icon="@drawable/cart"
+        android:title="Giỏ hàng"
+        tools:ignore="HardcodedText" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/profile"
+        android:title="Cá nhân"
+        tools:ignore="HardcodedText" />
+</menu>
