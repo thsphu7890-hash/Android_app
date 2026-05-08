@@ -1,5 +1,7 @@
 package com.example.hitcapp.Adapter;
 
+import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,62 +15,79 @@ import com.example.hitcapp.R;
 
 import java.util.List;
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
+/**
+ * Adapter hiển thị danh sách Hãng giày (Categories) dưới dạng các nút Chip bo tròn.
+ */
+public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
-    private List<Category> list;
-    private OnItemClickListener listener;
+    private List<Category> categoryList;
+    private final OnCategoryClickListener listener;
 
-    // Interface để xử lý sự kiện click từ Fragment
-    public interface OnItemClickListener {
-        void onItemClick(Category category);
+    // Interface để xử lý sự kiện khi người dùng chọn hãng (ví dụ lọc giày Nike)
+    public interface OnCategoryClickListener {
+        void onCategoryClick(Category category);
     }
 
-    public CategoryAdapter(List<Category> list, OnItemClickListener listener) {
-        this.list = list;
+    public CategoryAdapter(List<Category> categoryList, OnCategoryClickListener listener) {
+        this.categoryList = categoryList;
         this.listener = listener;
     }
 
-    // Hàm cập nhật dữ liệu khi API trả về
-    public void setData(List<Category> list) {
-        this.list = list;
+    /**
+     * Cập nhật lại danh sách dữ liệu khi gọi API xong
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    public void setData(List<Category> newList) {
+        this.categoryList = newList;
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Sử dụng file layout item_category.xml
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category, parent, false);
-        return new ViewHolder(view);
+    public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Nạp file giao diện item_category.xml ông đã tạo
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_category, parent, false);
+        return new CategoryViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Category category = list.get(position);
+    public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
+        Category category = categoryList.get(position);
+        if (category == null) return;
 
-        // Chỉ đổ tên, không cần lo về ảnh
-        holder.tvName.setText(category.getCategoryName());
+        // Hiển thị tên hãng từ Database (Nike, Adidas, Jordan...)
+        holder.tvCategoryName.setText(category.getCategoryName());
 
-        // Bắt sự kiện click vào item
+        // Xử lý sự kiện Click
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onItemClick(category);
+                listener.onCategoryClick(category);
+                // Log để ông kiểm tra trong Logcat xem click đúng hãng chưa
+                Log.d("CLICK_CATEGORY", "User selected: " + category.getCategoryName());
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return list != null ? list.size() : 0;
+        return (categoryList != null) ? categoryList.size() : 0;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName;
+    /**
+     * Lớp giữ các View trong layout giúp tăng hiệu năng
+     */
+    public static class CategoryViewHolder extends RecyclerView.ViewHolder {
+        TextView tvCategoryName;
 
-        public ViewHolder(@NonNull View itemView) {
+        public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Ánh xạ TextView từ item_category.xml
-            tvName = itemView.findViewById(R.id.tv_category_name);
+            // Ánh xạ ID từ file item_category.xml
+            tvCategoryName = itemView.findViewById(R.id.tv_category_name);
+
+            // Thêm hiệu ứng gợn sóng khi chạm vào nút (nếu CardView chưa có)
+            itemView.setClickable(true);
+            itemView.setFocusable(true);
         }
     }
 }

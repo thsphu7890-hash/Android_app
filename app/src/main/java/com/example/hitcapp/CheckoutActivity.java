@@ -26,13 +26,13 @@ public class CheckoutActivity extends AppCompatActivity {
 
         initViews();
 
-        // Nhận dữ liệu tổng tiền
+        // 1. Nhận dữ liệu tổng tiền (Đã được format bên CartFragment)
         String totalPrice = getIntent().getStringExtra("total_price");
         if (totalPrice != null) {
             tvTotal.setText(totalPrice);
         }
 
-        // Xử lý chọn thanh toán -> Hiện QR
+        // 2. Xử lý chọn thanh toán
         rgPayment.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_cod) {
                 paymentMethod = "COD";
@@ -42,13 +42,11 @@ public class CheckoutActivity extends AppCompatActivity {
             }
         });
 
-        // Nút Hủy
         btnCancel.setOnClickListener(v -> {
             Toast.makeText(this, "Đã hủy giao dịch", Toast.LENGTH_SHORT).show();
             finish();
         });
 
-        // Nút Xác nhận
         btnConfirm.setOnClickListener(v -> confirmOrder());
     }
 
@@ -73,11 +71,24 @@ public class CheckoutActivity extends AppCompatActivity {
         TextView tvContent = dialog.findViewById(R.id.tv_qr_content);
         Button btnDone = dialog.findViewById(R.id.btn_close_qr);
 
-        String amount = tvTotal.getText().toString().replace(".", "").replace("đ", "").trim();
-        // MB Bank của Phú (Thay số tài khoản vào đây)
-        String qrUrl = "https://img.vietqr.io/image/mbbank-123456789-compact.png?amount=" + amount + "&addInfo=HitCApp Pay";
+        // Xử lý tiền để gắn vào link VietQR (Xóa dấu chấm và chữ đ)
+        String rawAmount = tvTotal.getText().toString()
+                .replace(".", "")
+                .replace("đ", "")
+                .trim();
 
-        Glide.with(this).load(qrUrl).into(imgQR);
+        // Thay STK MB của Phú vào đây để nhận tiền nhé
+        String stkMB = "123456789";
+        String addInfo = "HitCApp_ThanhToan"; // Không dấu cho chắc
+
+        String qrUrl = "https://img.vietqr.io/image/mbbank-" + stkMB + "-compact.png?amount="
+                + rawAmount + "&addInfo=" + addInfo;
+
+        Glide.with(this)
+                .load(qrUrl)
+                .placeholder(R.drawable.loading)
+                .into(imgQR);
+
         tvContent.setText("Số tiền: " + tvTotal.getText().toString());
 
         btnDone.setOnClickListener(v -> dialog.dismiss());
@@ -85,10 +96,16 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void confirmOrder() {
-        if (edtName.getText().toString().isEmpty() || edtAddress.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Phú ơi, điền đủ thông tin đã!", Toast.LENGTH_SHORT).show();
+        String name = edtName.getText().toString().trim();
+        String address = edtAddress.getText().toString().trim();
+        String phone = edtPhone.getText().toString().trim();
+
+        if (name.isEmpty() || address.isEmpty() || phone.isEmpty()) {
+            Toast.makeText(this, "Bạn hãy điền đủ thông tin đã!", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // Sau này chỗ này sẽ gọi API để tạo đơn hàng trong DB
         Toast.makeText(this, "Đặt hàng thành công bằng " + paymentMethod, Toast.LENGTH_LONG).show();
         finish();
     }

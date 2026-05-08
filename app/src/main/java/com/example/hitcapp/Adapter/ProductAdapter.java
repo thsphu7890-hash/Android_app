@@ -1,7 +1,5 @@
 package com.example.hitcapp.Adapter;
 
-import static java.lang.String.format;
-
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.hitcapp.Model.Product;
 import com.example.hitcapp.R;
 import java.util.List;
@@ -18,17 +17,18 @@ import java.util.List;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
     private List<Product> productList;
-    private final RequestManager glide;
-    private final OnItemClickListener listener;
+    private final OnProductClickListener listener;
 
-    // Interface để truyền sự kiện ra ngoài Fragment
-    public interface OnItemClickListener {
-        void onItemClick(Product product);
+    // URL này phải khớp với cấu hình server Node.js của ông
+    private static final String IMAGE_BASE_URL = "http://192.168.1.253:5000/uploads/";
+
+    public interface OnProductClickListener {
+        void onProductClick(Product product);
     }
 
-    public ProductAdapter(List<Product> productList, RequestManager glide, OnItemClickListener listener) {
+    // Tui đã bỏ RequestManager glide để ông khởi tạo Fragment cho nhẹ nợ
+    public ProductAdapter(List<Product> productList, OnProductClickListener listener) {
         this.productList = productList;
-        this.glide = glide;
         this.listener = listener;
     }
 
@@ -41,36 +41,41 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_products, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
         return new ProductViewHolder(view);
     }
 
-    @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productList.get(position);
         if (product == null) return;
 
+        // Đổ data vào ID từ XML ông gửi
         holder.tvName.setText(product.getName());
+        holder.tvCategory.setText(product.getCategoryName());
 
+        // Format giá tiền
         try {
             double priceValue = Double.parseDouble(product.getPrice());
-            holder.tvPrice.setText(format("%,.0f VNĐ", priceValue));
+            holder.tvPrice.setText(String.format("%,.0fđ", priceValue).replace(",", "."));
         } catch (Exception e) {
-            holder.tvPrice.setText(String.format("%s VNĐ", product.getPrice()));
+            holder.tvPrice.setText(product.getPrice() + "đ");
         }
 
-        // Load ảnh từ Server
-        String fullImageUrl = "http://10.0.2.2:5000/uploads/" + product.getImageUrl();
-        glide.load(fullImageUrl)
-                .placeholder(R.drawable.ic_launcher_background)
+        // Xử lý hình ảnh - Nối link chuẩn
+        String fullImageUrl = IMAGE_BASE_URL + product.getImageUrl();
+
+        Glide.with(holder.itemView.getContext())
+                .load(fullImageUrl)
+                .placeholder(R.drawable.blue_shoes) // Ảnh mặc định trong item_product.xml
+                .error(R.drawable.blue_shoes)
                 .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.imgProduct);
 
-        // Bắt sự kiện Click vào toàn bộ Item
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onItemClick(product);
+                listener.onProductClick(product);
             }
         });
     }
@@ -81,14 +86,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
+        TextView tvName, tvPrice, tvCategory;
         ImageView imgProduct;
-        TextView tvName, tvPrice;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgProduct = itemView.findViewById(R.id.img_product);
+            // Ánh xạ đúng ID từ cái CardView ông gửi
             tvName = itemView.findViewById(R.id.tv_product_name);
             tvPrice = itemView.findViewById(R.id.tv_product_price);
+            tvCategory = itemView.findViewById(R.id.tv_product_category);
+            imgProduct = itemView.findViewById(R.id.img_product);
         }
     }
 }

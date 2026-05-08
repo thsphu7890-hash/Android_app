@@ -1,5 +1,7 @@
 package com.example.hitcapp.Adapter;
 
+import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +16,10 @@ import com.example.hitcapp.Fragment.CartFragment;
 import com.example.hitcapp.Model.CartItem;
 import com.example.hitcapp.R;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
@@ -38,44 +43,65 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         CartItem item = mList.get(position);
         if (item == null) return;
 
-        // 1. Đổ dữ liệu văn bản
+        // 1. Đổ dữ liệu văn bản và định dạng giá tiền (Ví dụ: 3.500.000đ)
         holder.tvName.setText(item.getName());
-        holder.tvPrice.setText(String.format("%sđ", item.getPrice()));
+
+        try {
+            double priceValue = Double.parseDouble(item.getPrice());
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+            symbols.setGroupingSeparator('.');
+            DecimalFormat decimalFormat = new DecimalFormat("#,###", symbols);
+            holder.tvPrice.setText(decimalFormat.format(priceValue) + "đ");
+        } catch (Exception e) {
+            holder.tvPrice.setText(item.getPrice() + "đ");
+        }
+
         holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
 
-        // 2. Load ảnh từ API bằng Glide
+        // 2. Load ảnh từ API (Đã sửa link /uploads/)
+        String imageUrl = item.getImageUrl();
+        String fullImageUrl;
+        if (imageUrl != null && imageUrl.startsWith("/")) {
+            fullImageUrl = "http://192.168.1.253:5000/uploads" + imageUrl;
+        } else {
+            fullImageUrl = CartFragment.IMAGE_BASE_URL + imageUrl;
+        }
+
         Glide.with(holder.itemView.getContext())
-                .load(item.getImageUrl()) // URL từ Model CartItem
-                .placeholder(R.drawable.blue_shoes) // Ảnh hiện khi đang tải
-                .error(R.drawable.blue_shoes)       // Ảnh hiện khi link lỗi
+                .load(fullImageUrl)
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.error_image)
                 .into(holder.imgProduct);
 
         // 3. Xử lý nút Tăng (+)
         holder.btnPlus.setOnClickListener(v -> {
-            int newQty = item.getQuantity() + 1;
-            item.setQuantity(newQty);
-            notifyItemChanged(holder.getAdapterPosition());
-            mFragment.calculateTotal();
-            // (Tùy chọn) Gọi API cập nhật số lượng trên server tại đây
+            int currentPos = holder.getAdapterPosition();
+            if (currentPos != RecyclerView.NO_POSITION) {
+                int newQty = item.getQuantity() + 1;
+                item.setQuantity(newQty);
+                notifyItemChanged(currentPos);
+                mFragment.calculateTotal(); // Cập nhật tổng tiền ở dưới cùng
+                // Ông nên gọi thêm API UpdateQuantity ở đây để lưu vào DB nhé
+            }
         });
 
         // 4. Xử lý nút Giảm (-)
         holder.btnMinus.setOnClickListener(v -> {
-            if (item.getQuantity() > 1) {
+            int currentPos = holder.getAdapterPosition();
+            if (currentPos != RecyclerView.NO_POSITION && item.getQuantity() > 1) {
                 int newQty = item.getQuantity() - 1;
                 item.setQuantity(newQty);
-                notifyItemChanged(holder.getAdapterPosition());
+                notifyItemChanged(currentPos);
                 mFragment.calculateTotal();
-                // (Tùy chọn) Gọi API cập nhật số lượng trên server tại đây
             }
         });
 
-        // 5. Xử lý nút Xóa (Gọi hàm xóa của Fragment để xóa trên API)
+        // 5. Xử lý nút Xóa
+        // Trong onBindViewHolder của CartAdapter.java
         holder.btnDelete.setOnClickListener(v -> {
             int currentPos = holder.getAdapterPosition();
             if (currentPos != RecyclerView.NO_POSITION) {
-                // Gọi hàm xóa có kết nối API mà mình vừa viết ở CartFragment
-                // item.getId() là ID của bản ghi giỏ hàng trong Database
+                // Sửa getCartId() thành getId() vì Model của ông đặt tên là id
                 mFragment.removeItemFromCart(item.getId(), currentPos);
             }
         });

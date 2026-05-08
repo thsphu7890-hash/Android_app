@@ -4,10 +4,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
+    // Thay IP máy tính của ông vào đây (ví dụ: 192.168.1.5)
+    // Không dùng localhost/127.0.0.1 vì Emulator không hiểu
+    private static final String BASE_URL = "http://192.168.1.253:5000/";
     private static Retrofit retrofit = null;
-
-    // Lưu ý: Thêm Port (ví dụ :8080) và dấu / ở cuối link
-    private static final String BASE_URL = "http:// 10.0.2.2:5000/";
 
     public static ApiService getApiService() {
         if (retrofit == null) {

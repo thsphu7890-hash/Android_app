@@ -2,6 +2,7 @@ package com.example.hitcapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -9,45 +10,90 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hitcapp.Model.User;
+import com.example.hitcapp.Model.UserRequest;
+import com.example.hitcapp.Network.RetrofitClient;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
+
+    private EditText edtEmail, edtPassword;
+    private Button btnLogin;
+    private TextView tvRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // 1. Ánh xạ các View
-        EditText edtUsername = findViewById(R.id.edt_username);
-        EditText edtPassword = findViewById(R.id.edt_password);
-        Button btnLogin = findViewById(R.id.btn_login);
-        TextView tvRegister = findViewById(R.id.tv_register);
+        // 1. Ánh xạ View
+        edtEmail = findViewById(R.id.edt_username); // ID trong XML của ông có thể là edt_username
+        edtPassword = findViewById(R.id.edt_password);
+        btnLogin = findViewById(R.id.btn_login);
+        tvRegister = findViewById(R.id.tv_register);
 
-        // 2. Xử lý Đăng nhập giả
+        // Nhận email từ màn hình đăng ký nếu có
+        String registeredUser = getIntent().getStringExtra("REGISTERED_USER");
+        if (registeredUser != null) {
+            edtEmail.setText(registeredUser);
+        }
+
+        // 2. Sự kiện nút Đăng nhập
         btnLogin.setOnClickListener(v -> {
-            String user = edtUsername.getText().toString().trim();
+            String email = edtEmail.getText().toString().trim();
             String pass = edtPassword.getText().toString().trim();
 
-            // Kiểm tra rỗng
-            if (user.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
+            if (email.isEmpty() || pass.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Logic giả: Đúng admin/123 thì cho qua
-            if (user.equals("admin") && pass.equals("123")) {
-                Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                Toast.makeText(this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
-            }
+            handleLogin(email, pass);
         });
 
-        // 3. Chuyển sang trang Đăng ký
+        // 3. Sự kiện chuyển sang màn hình Đăng ký
         tvRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
+        });
+    }
+
+    private void handleLogin(String email, String password) {
+        // Đóng gói dữ liệu vào UserRequest để khớp với ApiService
+        // Giả sử Backend của ông dùng Email để đăng nhập, truyền email vào field username/email
+        UserRequest loginRequest = new UserRequest("", email, password);
+
+        Log.d("API_DEBUG", "Đang đăng nhập với: " + email);
+
+        RetrofitClient.getApiService().login(loginRequest).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+
+                    Log.d("API_DEBUG", "Đăng nhập thành công: " + user.getUsername());
+                    Toast.makeText(LoginActivity.this, "Chào mừng " + user.getUsername(), Toast.LENGTH_SHORT).show();
+
+                    // Chuyển sang MainActivity và gửi kèm object User
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    // LƯU Ý: Class User phải implements Serializable mới không bị báo đỏ ở đây
+                    intent.putExtra("user_data", user);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Log.e("API_DEBUG", "Lỗi: " + response.code());
+                    Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.e("API_DEBUG", "Fail: " + t.getMessage());
+                Toast.makeText(LoginActivity.this, "Lỗi kết nối máy chủ!", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

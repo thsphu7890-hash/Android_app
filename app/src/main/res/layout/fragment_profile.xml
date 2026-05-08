@@ -40,8 +40,7 @@
             android:text="Thai Vinh Phu"
             android:textColor="#FFFFFF"
             android:textSize="22sp"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText" />
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -50,8 +49,7 @@
             android:layout_centerHorizontal="true"
             android:text="Khách hàng thân thiết"
             android:textColor="#B3E5FC"
-            android:textSize="14sp"
-            tools:ignore="HardcodedText" />
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <androidx.cardview.widget.CardView
@@ -60,12 +58,14 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="-40dp"
+        app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="15dp"
         app:cardElevation="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#FFFFFF"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -79,21 +79,20 @@
                 android:focusable="true">
 
                 <TextView
+                    android:id="@+id/tv_order_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="12"
                     android:textColor="#01579B"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Đơn hàng"
                     android:textSize="12sp"
-                    android:textColor="#64748B"
-                    tools:ignore="HardcodedText" />
+                    android:textColor="#64748B" />
             </LinearLayout>
 
             <View
@@ -113,21 +112,20 @@
                 android:focusable="true">
 
                 <TextView
+                    android:id="@+id/tv_voucher_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="5"
                     android:textColor="#01579B"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Voucher"
                     android:textSize="12sp"
-                    android:textColor="#64748B"
-                    tools:ignore="HardcodedText" />
+                    android:textColor="#64748B" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -136,12 +134,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="20dp"
         app:cardElevation="2dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#FFFFFF"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -167,15 +167,13 @@
                     android:layout_toEndOf="@id/ic1"
                     android:text="Lịch sử đơn hàng"
                     android:textColor="#1E293B"
-                    android:textSize="16sp"
-                    tools:ignore="HardcodedText" />
+                    android:textSize="16sp" />
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:src="@android:drawable/btn_plus"
-                    android:rotation="45"
+                    android:src="@drawable/ic_arrow_right"
                     app:tint="#CBD5E1" />
             </RelativeLayout>
 
@@ -208,15 +206,13 @@
                     android:layout_toEndOf="@id/ic2"
                     android:text="Địa chỉ của tôi"
                     android:textColor="#1E293B"
-                    android:textSize="16sp"
-                    tools:ignore="HardcodedText" />
+                    android:textSize="16sp" />
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:src="@android:drawable/btn_plus"
-                    android:rotation="45"
+                    android:src="@drawable/ic_arrow_right"
                     app:tint="#CBD5E1" />
             </RelativeLayout>
 
@@ -250,8 +246,7 @@
                     android:text="Đăng xuất"
                     android:textColor="#EF4444"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:textStyle="bold" />
             </RelativeLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -45,35 +45,44 @@
             android:src="@drawable/blue_shoes" />
 
         <TextView
-            android:id="@+id/tv_name"
+            android:id="@+id/tv_product_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/img_product"
             android:layout_marginTop="12dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Nike Air Jordan 1 Retro"
+            android:text="Tên giày"
             android:textColor="#263238"
             android:textSize="15sp"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText" />
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_product_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_product_name"
+            android:layout_marginTop="2dp"
+            android:text="Hãng sản xuất"
+            android:textColor="#01579B"
+            android:textSize="12sp"
+            android:textStyle="italic" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_name"
+            android:layout_below="@id/tv_product_category"
             android:layout_marginTop="8dp">
 
             <TextView
-                android:id="@+id/tv_price"
+                android:id="@+id/tv_product_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="2.500.000đ"
+                android:text="0đ"
                 android:textColor="#00B0FF"
                 android:textSize="14sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText" />
+                android:textStyle="bold" />
 
             <ImageView
                 android:layout_width="28dp"
@@ -83,7 +92,8 @@
                 android:backgroundTint="#01579B"
                 android:padding="4dp"
                 android:src="@android:drawable/ic_input_add"
-                app:tint="#FFFFFF" />
+                app:tint="#FFFFFF"
+                android:importantForAccessibility="no" />
         </RelativeLayout>
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

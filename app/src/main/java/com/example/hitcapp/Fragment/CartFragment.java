@@ -24,8 +24,11 @@ import com.example.hitcapp.Model.CartItem;
 import com.example.hitcapp.Network.RetrofitClient;
 import com.example.hitcapp.R;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -39,29 +42,29 @@ public class CartFragment extends Fragment {
     private List<CartItem> cartList;
     private CartAdapter adapter;
 
+    public static final String IMAGE_BASE_URL = "http://192.168.1.253:5000/uploads/";
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cart, container, false);
 
-        // 1. Ánh xạ các View
         rvCartItems = view.findViewById(R.id.rv_cart_items);
         tvTotalPrice = view.findViewById(R.id.tv_total_price);
         layoutEmptyCart = view.findViewById(R.id.layout_empty_cart);
         Button btnCheckout = view.findViewById(R.id.btn_checkout);
 
-        // 2. Setup RecyclerView ban đầu
         cartList = new ArrayList<>();
         adapter = new CartAdapter(cartList, this);
         rvCartItems.setLayoutManager(new LinearLayoutManager(getContext()));
         rvCartItems.setAdapter(adapter);
 
-        // 3. Sự kiện Thanh toán
         btnCheckout.setOnClickListener(v -> {
             if (cartList.isEmpty()) {
                 Toast.makeText(getActivity(), "Giỏ hàng đang trống!", Toast.LENGTH_SHORT).show();
             } else {
                 Intent intent = new Intent(getActivity(), CheckoutActivity.class);
+                // Gửi số tiền đã format sang Checkout
                 intent.putExtra("total_price", tvTotalPrice.getText().toString());
                 startActivity(intent);
             }
@@ -73,12 +76,10 @@ public class CartFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Load lại data mỗi khi quay lại Fragment
         fetchCartData();
     }
 
     private void fetchCartData() {
-        // Tạm thời fix cứng userId = 1 để test
         RetrofitClient.getApiService().getCart(1).enqueue(new Callback<List<CartItem>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
@@ -87,7 +88,6 @@ public class CartFragment extends Fragment {
                     cartList.clear();
                     cartList.addAll(response.body());
                     adapter.notifyDataSetChanged();
-
                     calculateTotal();
                     checkCartStatus();
                 }
@@ -96,65 +96,68 @@ public class CartFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<List<CartItem>> call, @NonNull Throwable t) {
                 if (isAdded()) {
-                    Log.e("API_ERROR", "Cart fail: " + t.getMessage());
+                    Log.e("API_ERROR", "Lỗi tải giỏ hàng: " + t.getMessage());
                     checkCartStatus();
                 }
             }
         });
     }
 
-    // HÀM XÓA ITEM - Sửa lại để mượt và chính xác
     public void removeItemFromCart(int cartId, int position) {
         RetrofitClient.getApiService().removeFromCart(cartId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
-                    // Kiểm tra bounds để tránh crash App
                     if (position >= 0 && position < cartList.size()) {
                         cartList.remove(position);
-
-                        // Thông báo xóa item kèm hiệu ứng mượt
                         adapter.notifyItemRemoved(position);
-
-                        // Cập nhật lại dải index cho các item còn lại
                         adapter.notifyItemRangeChanged(position, cartList.size());
-
                         calculateTotal();
                         checkCartStatus();
-                        Toast.makeText(getContext(), "Đã xóa khỏi giỏ hàng", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getContext(), "Không thể xóa trên Server!", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Lỗi kết nối khi xóa!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Lỗi kết nối server", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    @SuppressLint("DefaultLocale")
+    /**
+     * HÀM TÍNH TIỀN ĐÃ ĐƯỢC CẬP NHẬT
+     * Sử dụng DecimalFormat để đảm bảo phân cách hàng nghìn bằng dấu chấm chuẩn VN.
+     */
     public void calculateTotal() {
-        long total = 0;
+        double total = 0;
         for (CartItem item : cartList) {
             try {
-                // Regex lấy số từ chuỗi price
-                String priceStr = item.getPrice().replaceAll("[^0-9]", "");
-                long price = Long.parseLong(priceStr);
+                // Giá từ API thường là chuỗi số "3500000.00"
+                double price = Double.parseDouble(item.getPrice());
                 total += price * item.getQuantity();
             } catch (Exception e) {
-                Log.e("PARSE_ERROR", "Lỗi tính tiền: " + e.getMessage());
+                Log.e("PARSE_ERROR", "Lỗi định dạng giá: " + item.getPrice());
             }
         }
-        tvTotalPrice.setText(String.format("%,dđ", total).replace(",", "."));
+
+        // Cấu hình định dạng: dấu chấm phân cách hàng nghìn
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+        symbols.setGroupingSeparator('.');
+
+        DecimalFormat decimalFormat = new DecimalFormat("#,###", symbols);
+        String formattedPrice = decimalFormat.format(total);
+
+        // Hiển thị: 3.500.000đ
+        tvTotalPrice.setText(formattedPrice + "đ");
     }
 
     public void checkCartStatus() {
         if (cartList.isEmpty()) {
             layoutEmptyCart.setVisibility(View.VISIBLE);
             rvCartItems.setVisibility(View.GONE);
+            tvTotalPrice.setText("0đ");
         } else {
             layoutEmptyCart.setVisibility(View.GONE);
             rvCartItems.setVisibility(View.VISIBLE);

@@ -23,8 +23,7 @@
         android:text="Chào mừng trở lại!"
         android:textColor="#01579B"
         android:textSize="24sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText" />
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -32,82 +31,79 @@
         android:layout_marginBottom="32dp"
         android:text="Đăng nhập để tiếp tục mua sắm"
         android:textColor="#546E7A"
-        android:textSize="14sp"
-        tools:ignore="HardcodedText" />
+        android:textSize="14sp" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="15dp"
-        app:cardElevation="6dp">
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#FFFFFF"> <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="#FFFFFF"> <EditText
+        android:id="@+id/edt_username"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edit_text_border"
+        android:drawableStart="@android:drawable/ic_menu_my_calendar"
+        android:drawablePadding="12dp"
+        android:hint="Email hoặc Tên đăng nhập"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#999999"
+        android:textSize="15sp" />
 
-        <LinearLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_marginBottom="10dp"
+            app:hintEnabled="false"
+            app:passwordToggleEnabled="true"
+            app:passwordToggleTint="#00B0FF">
 
-            <EditText
-                android:id="@+id/edt_username"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_password"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:layout_marginBottom="16dp"
                 android:background="@drawable/edit_text_border"
-                android:drawableStart="@android:drawable/ic_menu_my_calendar"
+                android:drawableStart="@android:drawable/ic_lock_idle_lock"
                 android:drawablePadding="12dp"
-                android:hint="Email hoặc Tên đăng nhập"
-                android:inputType="textEmailAddress"
+                android:hint="Mật khẩu"
+                android:inputType="textPassword"
                 android:padding="12dp"
-                android:textSize="15sp"
-                tools:ignore="HardcodedText" />
+                android:textColor="#000000"
+                android:textColorHint="#999999"
+                android:textSize="15sp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:hintEnabled="false"
-                app:passwordToggleEnabled="true"
-                app:passwordToggleTint="#00B0FF">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginBottom="20dp"
+            android:text="Quên mật khẩu?"
+            android:textColor="#00B0FF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edt_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    android:background="@drawable/edit_text_border"
-                    android:drawableStart="@android:drawable/ic_lock_idle_lock"
-                    android:drawablePadding="12dp"
-                    android:hint="Mật khẩu"
-                    android:inputType="textPassword"
-                    android:padding="12dp"
-                    android:textSize="15sp"
-                    tools:ignore="HardcodedText" />
-            </com.google.android.material.textfield.TextInputLayout>
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:backgroundTint="#00B0FF"
+            android:text="Đăng nhập"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginBottom="20dp"
-                android:text="Quên mật khẩu?"
-                android:textColor="#00B0FF"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText" />
-
-            <Button
-                android:id="@+id/btn_login"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:backgroundTint="#00B0FF"
-                android:text="Đăng nhập"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                tools:ignore="HardcodedText" />
-
-        </LinearLayout>
+    </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <LinearLayout
@@ -120,8 +116,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Chưa có tài khoản? "
-            android:textColor="#546E7A"
-            tools:ignore="HardcodedText" />
+            android:textColor="#546E7A" />
 
         <TextView
             android:id="@+id/tv_register"
@@ -129,8 +124,7 @@
             android:layout_height="wrap_content"
             android:text="Đăng ký ngay"
             android:textColor="#00B0FF"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText" />
+            android:textStyle="bold" />
     </LinearLayout>
 
 </LinearLayout>

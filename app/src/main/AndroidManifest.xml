@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -16,28 +17,45 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <activity android:name=".CheckoutActivity" android:exported="false" />
         <activity
-            android:name=".DetailActivity"
-            android:exported="false"
-            android:label="Chi tiết sản phẩm"
-            android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:label="HITC Store"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".LoginActivity"
+            android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity" android:exported="false" android:label="Đăng ký tài khoản" />
-        <activity android:name=".HomeActivity" android:exported="false" />
+
+        <activity
+            android:name=".CheckoutActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".DetailActivity"
+            android:exported="false"
+            android:label="Chi tiết sản phẩm"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="HITC Store"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:label="Đăng ký tài khoản" />
+
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

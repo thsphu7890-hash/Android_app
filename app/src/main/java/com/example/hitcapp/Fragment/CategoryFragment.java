@@ -2,93 +2,104 @@ package com.example.hitcapp.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hitcapp.Adapter.ProductAdapter;
 import com.example.hitcapp.DetailActivity;
+import com.example.hitcapp.Model.Product;
+import com.example.hitcapp.Network.RetrofitClient;
 import com.example.hitcapp.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CategoryFragment extends Fragment {
 
-    // Dữ liệu mẫu (sau này ông có thể thay bằng gọi API như bên HomeFragment)
-    String[] names = {"Nike Air Max", "Adidas Forum", "Jordan 4 Retro", "Vans Old Skool", "Puma RS-X", "Converse 70s"};
-    String[] prices = {"3.500.000đ", "2.800.000đ", "5.200.000đ", "1.500.000đ", "2.100.000đ", "1.900.000đ"};
-    String[] descs = {
-            "Dòng Air Max êm ái, phù hợp chạy bộ.",
-            "Phong cách cổ điển, phối màu cực chất.",
-            "Huyền thoại bóng rổ, sang trọng và đẳng cấp.",
-            "Bền bỉ, cá tính cho các bạn trẻ.",
-            "Thiết kế tương lai, hầm hố.",
-            "Vẻ đẹp vượt thời gian, dễ phối đồ."
-    };
+    private RecyclerView rvProducts;
+    private ProductAdapter adapter;
+    private List<Product> productList;
+
+    // Đã sửa: Khớp với app.use('/uploads', ...) trong Node.js của ông
+    private static final String IMAGE_BASE_URL = "http://192.168.1.253:5000/uploads/";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_category, container, false);
 
-        // --- CHỖ CẦN SỬA ---
-        // Ánh xạ đúng ID của GridView trong fragment_category.xml
-        GridView gvProducts = view.findViewById(R.id.gv_cate);
+        rvProducts = view.findViewById(R.id.gv_cate);
+        rvProducts.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        // Nếu GridView tìm thấy (không null) thì mới gán adapter
-        if (gvProducts != null) {
-            gvProducts.setAdapter(new CategoryProductAdapter());
-        }
+        productList = new ArrayList<>();
+
+        // Khởi tạo Adapter
+        adapter = new ProductAdapter(productList, product -> {
+            Intent intent = new Intent(getActivity(), DetailActivity.class);
+
+            // Xử lý link ảnh an toàn (tránh lỗi thừa/thiếu dấu gạch chéo)
+            String imgName = product.getImageUrl();
+            String fullImageUrl;
+
+            if (imgName != null && imgName.startsWith("/")) {
+                fullImageUrl = "http://192.168.1.253:5000/uploads" + imgName;
+            } else {
+                fullImageUrl = IMAGE_BASE_URL + imgName;
+            }
+
+            // TRUYỀN DỮ LIỆU SANG DETAIL
+            intent.putExtra("product_id", product.getId());
+            intent.putExtra("product_name", product.getName());
+            intent.putExtra("product_price", product.getPrice());
+            intent.putExtra("product_description", product.getDescription());
+            intent.putExtra("product_category", product.getCategoryName());
+            intent.putExtra("product_image", fullImageUrl); // Truyền link đã nối xong
+
+            startActivity(intent);
+        });
+
+        rvProducts.setAdapter(adapter);
+        loadProductsFromApi();
 
         return view;
     }
 
-    private class CategoryProductAdapter extends BaseAdapter {
-        @Override
-        public int getCount() {
-            return names.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return names[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                // Đảm bảo file R.layout.item_product là file chứa ImageView và TextView
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_product, parent, false);
+    private void loadProductsFromApi() {
+        RetrofitClient.getApiService().getAllProducts().enqueue(new Callback<List<Product>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Product>> call, @NonNull Response<List<Product>> response) {
+                if (isAdded() && getActivity() != null) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        productList.clear();
+                        productList.addAll(response.body());
+                        adapter.setData(productList);
+                        Log.d("API_DEBUG", "Load thành công " + productList.size() + " sản phẩm");
+                    } else {
+                        Log.e("API_DEBUG", "Lỗi phản hồi: " + response.code());
+                    }
+                }
             }
 
-            ImageView imgProduct = convertView.findViewById(R.id.img_product);
-            TextView tvName = convertView.findViewById(R.id.tv_name);
-            TextView tvPrice = convertView.findViewById(R.id.tv_price);
-
-            tvName.setText(names[position]);
-            tvPrice.setText(prices[position]);
-            imgProduct.setImageResource(R.drawable.blue_shoes);
-
-            // Click vào từng ô sản phẩm
-            convertView.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("product_name", names[position]);
-                intent.putExtra("product_price", prices[position]);
-                intent.putExtra("product_desc", descs[position]);
-                startActivity(intent);
-            });
-
-            return convertView;
-        }
+            @Override
+            public void onFailure(@NonNull Call<List<Product>> call, @NonNull Throwable t) {
+                if (isAdded() && getActivity() != null) {
+                    Log.e("API_DEBUG", "Lỗi kết nối: " + t.getMessage());
+                    Toast.makeText(getContext(), "Lỗi kết nối server", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

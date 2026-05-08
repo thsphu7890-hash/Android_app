@@ -1,46 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#F8FAFC">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/layout_bottom_action"
-        android:scrollbars="none">
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/card_action"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="350dp"
-                android:background="#F0F7FF">
+                android:layout_height="380dp"
+                android:background="#FFFFFF">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_bottom_rounded_light_blue" />
 
                 <ImageView
                     android:id="@+id/img_detail_product"
-                    android:layout_width="300dp"
-                    android:layout_height="250dp"
-                    android:layout_centerInParent="true"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/blue_shoes" />
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    android:layout_margin="30dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/blue_shoes"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageButton
                     android:id="@+id/btn_back"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="20dp"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_margin="16dp"
                     android:background="@drawable/bg_circle_white"
-                    android:importantForAccessibility="no"
-                    android:src="@android:drawable/ic_menu_revert"
-                    app:tint="#01579B" />
-            </RelativeLayout>
+                    android:elevation="4dp"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_back"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="#0F172A" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -50,91 +59,117 @@
 
                 <TextView
                     android:id="@+id/tv_detail_name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Nike Air Jordan 1 Blue"
-                    android:textColor="#333333"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:text="Tên sản phẩm"
+                    android:textColor="#0F172A"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tv_detail_price"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="3.200.000đ"
-                    android:textColor="#D32F2F"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_detail_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_category_tag"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="Nike"
+                        android:textColor="#00B0FF"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/tv_detail_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0đ"
+                        android:textColor="#EF4444"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginVertical="15dp"
-                    android:background="#EEEEEE" />
+                    android:layout_marginVertical="20dp"
+                    android:background="#E2E8F0" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Mô tả sản phẩm"
-                    android:textColor="#01579B"
+                    android:textColor="#334155"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tv_detail_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:lineSpacingExtra="5dp"
-                    android:text="Dòng giày Sneaker huyền thoại với phối màu xanh trắng cực ngầu. Chất liệu da cao cấp, đế Air êm ái hỗ trợ vận động cả ngày dài không lo mỏi chân."
-                    android:textColor="#666666"
-                    android:textSize="14sp"
-                    tools:ignore="HardcodedText" />
+                    android:lineSpacingExtra="6dp"
+                    android:text="Thông tin chi tiết về sản phẩm..."
+                    android:textColor="#64748B"
+                    android:textSize="15sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp" />
 
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
-        android:id="@+id/layout_bottom_action"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_action"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
-        android:elevation="10dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingHorizontal="20dp">
+        android:layout_height="wrap_content"
+        app:cardElevation="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_add_cart"
-            android:layout_width="0dp"
-            android:layout_height="55dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_button_outline"
-            android:text="Thêm giỏ hàng"
-            android:textColor="#01579B"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:weightSum="2">
 
-        <View
-            android:layout_width="15dp"
-            android:layout_height="0dp" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_add_cart"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_outline"
+                android:text="Thêm giỏ hàng"
+                android:textAllCaps="false"
+                android:textColor="#00B0FF"
+                android:textStyle="bold" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_buy_now"
-            android:layout_width="0dp"
-            android:layout_height="55dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_button_solid"
-            android:text="Mua ngay"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText" />
-    </LinearLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_buy_now"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_solid"
+                android:text="Mua ngay"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

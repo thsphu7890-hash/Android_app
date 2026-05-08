@@ -4,22 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="2dp">
-
-    <TextView
-        android:id="@+id/tv_category_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:text="Tên danh mục"
-        android:textColor="#333333"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText" />
+    android:layout_margin="6dp"
+    app:cardCornerRadius="25dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="#F1F5F9"> <TextView
+    android:id="@+id/tv_category_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:minWidth="80dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:text="Tên danh mục"
+    android:textColor="#1E293B"
+    android:textSize="14sp"
+    android:textStyle="bold"
+    tools:ignore="HardcodedText" />
 
 </androidx.cardview.widget.CardView>

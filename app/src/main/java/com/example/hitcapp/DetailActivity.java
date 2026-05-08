@@ -18,8 +18,6 @@ import com.bumptech.glide.Glide;
 import com.example.hitcapp.Model.Product;
 import com.example.hitcapp.Network.RetrofitClient;
 
-import java.util.Objects;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,10 +25,13 @@ import retrofit2.Response;
 public class DetailActivity extends AppCompatActivity {
 
     private ImageView imgProduct;
-    private TextView tvName, tvPrice, tvDesc;
+    private TextView tvName, tvPrice, tvDesc, tvCategory;
     private ImageButton btnBack;
     private Button btnAddCart, btnBuyNow;
-    private int productId; // Lưu ID để dùng cho các thao tác khác như Add Cart
+    private int productId;
+
+    // ĐÃ SỬA: Khớp 100% với server và CategoryFragment
+    private static final String IMAGE_BASE_URL = "http://192.168.1.253:5000/uploads/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +41,11 @@ public class DetailActivity extends AppCompatActivity {
 
         initViews();
 
-        // Nhận ID sản phẩm từ Intent
         productId = getIntent().getIntExtra("product_id", -1);
 
         if (productId != -1) {
             loadProductDetailFromApi(productId);
         } else {
-            // Nếu không có ID, dùng dữ liệu cũ truyền qua intent làm fallback
             getDataFromIntent();
         }
 
@@ -58,28 +57,25 @@ public class DetailActivity extends AppCompatActivity {
         tvName = findViewById(R.id.tv_detail_name);
         tvPrice = findViewById(R.id.tv_detail_price);
         tvDesc = findViewById(R.id.tv_detail_desc);
+        tvCategory = findViewById(R.id.tv_detail_category);
         btnBack = findViewById(R.id.btn_back);
         btnAddCart = findViewById(R.id.btn_add_cart);
         btnBuyNow = findViewById(R.id.btn_buy_now);
     }
 
-    // GỌI API ĐỂ LẤY DỮ LIỆU CHI TIẾT MỚI NHẤT
     private void loadProductDetailFromApi(int id) {
         RetrofitClient.getApiService().getProductDetail(id).enqueue(new Callback<Product>() {
             @Override
             public void onResponse(@NonNull Call<Product> call, @NonNull Response<Product> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Product product = response.body();
-                    displayProduct(product);
+                    displayProduct(response.body());
                 } else {
-                    Toast.makeText(DetailActivity.this, "Không thể tải chi tiết sản phẩm!", Toast.LENGTH_SHORT).show();
-                    getDataFromIntent(); // Lỗi API thì dùng tạm data từ Intent
+                    getDataFromIntent();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Product> call, @NonNull Throwable t) {
-                Log.e("API_ERROR", Objects.requireNonNull(t.getMessage()));
                 getDataFromIntent();
             }
         });
@@ -88,23 +84,53 @@ public class DetailActivity extends AppCompatActivity {
     @SuppressLint("DefaultLocale")
     private void displayProduct(Product product) {
         tvName.setText(product.getName());
-        tvPrice.setText(String.format("%,.0fđ", product.getPrice())); // Định dạng tiền tệ
+
+        if (tvCategory != null) {
+            tvCategory.setText("Hãng: " + (product.getCategoryName() != null ? product.getCategoryName() : "Khác"));
+        }
+
+        // Định dạng giá tiền chuẩn (3.500.000đ)
+        try {
+            double priceValue = Double.parseDouble(product.getPrice());
+            tvPrice.setText(String.format("%,.0fđ", priceValue).replace(",", "."));
+        } catch (Exception e) {
+            tvPrice.setText(product.getPrice() + "đ");
+        }
+
         tvDesc.setText(product.getDescription());
 
+        // Nối link ảnh an toàn
+        String imgName = product.getImageUrl();
+        String fullImageUrl;
+        if (imgName != null && imgName.startsWith("/")) {
+            fullImageUrl = "http://192.168.1.253:5000/uploads" + imgName;
+        } else {
+            fullImageUrl = IMAGE_BASE_URL + imgName;
+        }
+
         Glide.with(this)
-                .load(product.getImageUrl())
-                .placeholder(R.drawable.blue_shoes)
+                .load(fullImageUrl)
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.error_image)
                 .into(imgProduct);
     }
 
-    // Giữ lại hàm này để phòng hờ trường hợp API lỗi
     private void getDataFromIntent() {
         Intent intent = getIntent();
         if (intent != null) {
             tvName.setText(intent.getStringExtra("product_name"));
             tvPrice.setText(intent.getStringExtra("product_price"));
-            tvDesc.setText(intent.getStringExtra("product_desc"));
-            Glide.with(this).load(intent.getStringExtra("product_image")).into(imgProduct);
+            tvDesc.setText(intent.getStringExtra("product_description"));
+
+            if (tvCategory != null) {
+                tvCategory.setText("Hãng: " + intent.getStringExtra("product_category"));
+            }
+
+            // Ở đây lấy trực tiếp vì bên Fragment đã gửi link FULL rồi
+            Glide.with(this)
+                    .load(intent.getStringExtra("product_image"))
+                    .placeholder(R.drawable.loading)
+                    .into(imgProduct);
         }
     }
 
@@ -112,12 +138,30 @@ public class DetailActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         btnAddCart.setOnClickListener(v -> {
-            // Sau này Phú sẽ gọi API @POST("api/cart") ở đây với productId
-            Toast.makeText(this, "Đã thêm " + tvName.getText() + " vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+            int userId = 1; // ID mẫu
+            int quantity = 1;
+
+            RetrofitClient.getApiService().addToCart(userId, productId, quantity).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(DetailActivity.this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(DetailActivity.this, "Không thể thêm vào giỏ!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                    Toast.makeText(DetailActivity.this, "Lỗi kết nối server!", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         btnBuyNow.setOnClickListener(v -> {
-            Toast.makeText(this, "Đang xử lý đơn hàng cho ID: " + productId, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, CheckoutActivity.class);
+            intent.putExtra("product_id", productId);
+            startActivity(intent);
         });
     }
 }

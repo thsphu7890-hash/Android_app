@@ -11,6 +11,12 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_navigation" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/bottom_navigation"
+        android:background="#E2E8F0" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
@@ -19,8 +25,8 @@
         android:background="#FFFFFF"
         app:elevation="20dp"
         app:itemIconSize="26dp"
-        app:itemIconTint="@null"
-        app:itemTextColor="#00B0FF"
+        app:itemIconTint="@color/nav_item_color_state"
+        app:itemTextColor="@color/nav_item_color_state"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 
